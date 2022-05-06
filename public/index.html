@@ -33,7 +33,26 @@
       </div>
     </form>
 
-    <section id="contactContainer"></section>
+    <script id="contact_list" type="text/x-handlebars">
+        {{#each contacts}}
+          {{> contact}}
+        {{/each}}
+    </scrip>
 
+    <script id="contactPartial" type="text/x-handlebars">
+      <div>
+        <h3>{{full_name}}</h3>
+      </div>
+      <div>
+        <p>
+          <strong>Phone number:</strong>
+          {{phone_number}}
+        </p>
+      </div>
+      <div>
+        <strong>Email:</strong>
+        {{email}}
+      </div>
+    </script>
   </body>
 </html>
