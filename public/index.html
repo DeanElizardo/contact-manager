@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Contact Manager</title>
+    <link rel="stylesheet" href="./stylesheets/style.css" />
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/handlebars.js"></script>
+    <script src="/javascripts/main.js" defer="true"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Contact's Manager</h1>
+    </header>
+    <!-- -->
+    <form
+      id="searchAndEntry"
+      name="searchAndEntry"
+      method="POST"
+      action="/addContact"
+    >
+      <div>
+        <input type="submit" name="addContact" value="Add Contact" />
+      </div>
+      <div>
+        <input
+          id="searchField"
+          type="text"
+          name="search"
+          placeholder="Search"
+        />
+      </div>
+    </form>
+
+    <section id="contactContainer"></section>
+
+  </body>
+</html>
