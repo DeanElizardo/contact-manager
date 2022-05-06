@@ -36,12 +36,12 @@
     <script id="contact_list" type="text/x-handlebars">
       <ul>
         {{#each contacts}}
-        {{> contactPartial}}
+        {{> contact_partial}}
         {{/each}}
       <ul>
     </scrip>
 
-    <script id="contactPartial" type="text/x-handlebars">
+    <script id="contact_partial" type="text/x-handlebars">
       <li>
         <fieldset style="border: solid black 1px">
           <div>
@@ -57,6 +57,10 @@
             <strong>Email:</strong>
             {{email}}
           </div>
+        <div>
+          <button id="edit{{id}}" value="Edit"></button>
+          <button id="delete{{id}}" value="Delete"></button>
+        </div>
         </fieldset>
       </li>
     </script>
