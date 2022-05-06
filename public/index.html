@@ -34,25 +34,31 @@
     </form>
 
     <script id="contact_list" type="text/x-handlebars">
+      <ul>
         {{#each contacts}}
-          {{> contact}}
+        {{> contactPartial}}
         {{/each}}
+      <ul>
     </scrip>
 
     <script id="contactPartial" type="text/x-handlebars">
-      <div>
-        <h3>{{full_name}}</h3>
-      </div>
-      <div>
-        <p>
-          <strong>Phone number:</strong>
-          {{phone_number}}
-        </p>
-      </div>
-      <div>
-        <strong>Email:</strong>
-        {{email}}
-      </div>
+      <li>
+        <fieldset style="border: solid black 1px">
+          <div>
+            <h3>{{full_name}}</h3>
+          </div>
+          <div>
+            <p>
+              <strong>Phone number:</strong>
+              {{phone_number}}
+            </p>
+          </div>
+          <div>
+            <strong>Email:</strong>
+            {{email}}
+          </div>
+        </fieldset>
+      </li>
     </script>
   </body>
 </html>
