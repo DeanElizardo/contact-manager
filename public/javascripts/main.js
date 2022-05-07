@@ -1,30 +1,52 @@
-//Contact container
+//=============================================================Contact container
 let container = document.querySelector("#contactContainer");
 
+Handlebars.registerPartial(
+  "contact_partial",
+  document.querySelector("#contact_partial").innerHTML
+);
+let contactList = Handlebars.compile(
+  document.querySelector("#contact_list").innerHTML
+);
+
+// load all contacts in lexicographical order by default
 document.addEventListener("DOMContentLoaded", async function (event) {
-  console.log("RUN!");
   let contacts = await getContacts();
-  sortContacts(contacts);
-  contacts.forEach(contact => console.log(contact));
+  renderContactContainer(contacts);
 });
 
-//Search Field
+//==================================================================Search Field
+
 document
   .querySelector("#searchField")
-  .addEventListener("keyup", function (event) {
+  .addEventListener("keyup", async function (event) {
     event.preventDefault();
+    let searchString = event.currentTarget.value;
+
+    // let key = event.key;
+    //
+    // if (/[a-z]/i.test(key)) {
+    // searchString += key;
+    // } else if (key.toLowerCase() === 'backspace') {
+    // searchString = searchString.slice(0, searchString.length - 1);
+    // }
+
+    let contacts = await getContacts();
+    let matching = matchingSubstrings(contacts, searchString);
+
+    renderContactContainer(matching);
   });
 
-//'Add Contact' Button
+//=========================================================='Add Contact' Button
 document
-  .querySelector("#searchAndEntry")
+  .querySelector("form#searchAndEntry")
   .addEventListener("submit", function (event) {
     event.preventDefault();
 
-    alert(searchField.value);
+    alert("Default Prevented");
   });
 
-//Helper functions
+//==============================================================Helper functions
 async function getContacts() {
   try {
     var response = await fetch("/api/contacts", {
@@ -48,4 +70,38 @@ function sortContacts(contacts) {
       return 0;
     }
   });
+}
+
+function matchingSubstrings(contacts, searchString) {
+  if (searchString == "") {
+    return contacts;
+  }
+  let search = new RegExp(searchString, "i");
+  return contacts.filter((contact) => search.test(contact.full_name));
+}
+
+function renderContactContainer(contacts) {
+  container.innerHTML = "";
+
+  if (contacts.length) {
+    container.insertAdjacentHTML(
+      "afterbegin",
+      contactList({ contacts: contacts })
+    );
+  } else {
+    let headerDiv = document.createElement("div");
+    let buttonDiv = document.createElement("div");
+
+    let noContactHeader = document.createElement("h2");
+    noContactHeader.textContent = "There are no contacts";
+
+    let noContactButton = document.createElement("button");
+    noContactButton.setAttribute("id", "no_contact_add_button");
+    noContactButton.textContent = "Add Contact";
+
+    container.appendChild(headerDiv);
+    container.appendChild(buttonDiv);
+    headerDiv.appendChild(noContactHeader);
+    buttonDiv.appendChild(noContactButton);
+  }
 }
