@@ -38,14 +38,40 @@ searchField.addEventListener("keyup", async function (event) {
 });
 
 //================================================================='Add Contact'
-addForm.addEventListener("submit", function (event) {
+addForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
-  let form = event.currentTarget;
-  let data = new FormData(form);
+  let formData = new FormData(event.currentTarget);
+  let data = {};
 
-  console.log(form); //!debugging
-  console.log(data.get("email")); //!debugging
+  let tags = [];
+  for (let entry of formData) {
+    if (/tag_/.test(entry[0])) {
+      tags.push(entry[1]);
+    } else {
+      data[entry[0]] = entry[1];
+    }
+  }
+
+  let tagString = tags.join(',');
+
+  data['tags'] = (tagString === '' ? null : tagString);
+  try {
+    let response = await fetch('/api/contacts/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+  } catch (error) {
+    console.log(`Fetch failed in adding contact: ${error}`);
+  }
+
+  addForm.reset();
+  searchForm.reset();
+
+  cancelAdd.dispatchEvent(new Event("click"));
 });
 
 cancelAdd.addEventListener("click", async function (event) {
@@ -179,7 +205,6 @@ function showSearchPhase() {
 
 function addContactForm(clickEvent, currentTags) {
   clickEvent.preventDefault();
-  console.log("CURRENT TAGS", currentTags); //!debugging
 
   showAddPhase(currentTags);
 }
