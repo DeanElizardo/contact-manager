@@ -13,13 +13,16 @@
     ></script>
     <script src="/javascripts/main.js" defer="true"></script>
   </head>
-  <body>
+  <body id="body">
     <header>
-      <h1>Ugly Contacts Manager</h1>
+      <h1 class="searchPhase">
+        Ugly Contacts Manager
+      </h1>
     </header>
     <form
       id="searchAndEntry"
       name="searchAndEntry"
+      class="searchPhase"
       method="POST"
       action="/addContact"
     >
@@ -35,8 +38,49 @@
         />
       </div>
     </form>
+    
+    <div id="contactContainer" class="searchPhase"></div>
 
-    <div id="contactContainer"></div>
+    <div id="add_contact_div"  class="addPhase" style="display: none">
+      <form id="add_contact_form" name="addContact" method="POST" action="/addContact">
+        <div>
+          <label for="full_name">Name:  </label>
+          <input type="text" id="full_name" name="full_name">
+        </div>
+        <div>
+          <label for="phone_number">Phone: </label>
+          <input type="text" id="phone_number" name="phone_number">
+        </div>
+        <div>
+          <label for="email">Email:  </label>
+          <input type="text" id="email" name="email">
+        </div>
+        <div id="contact_tags"></div>
+        <div>
+          <button id="cancel_add">Cancel</button>
+          <input type="submit" value="Add Contact">
+        </div>
+      </form>
+    </div>
+
+    <script id="contact_tags_template" type="text/x-handlebars">
+      {{#if tags}}
+      <label for="tags_list">Tags: </label>
+      <ul id="tags_list" style="list-style: none">
+        {{#each tags}}
+        <li>
+          <input type="checkbox" id="tag_{{this}}" name="{{this}}" value="{{this}}">
+          <label for="tag_{{this}}">{{this}}</label>
+        </li>
+        {{/each}}
+      </ul>
+      {{/if}}
+      <div>
+        <label for="new_tag">New Tag</label>
+        <input type="text" id="new_tag" name="new_tag">
+      </div>
+    </script>
+
 
     <script id="contact_list" type="text/x-handlebars">
       <ul style="list-style: none">
@@ -80,6 +124,5 @@
         </div>
         </fieldset>
       </li>
-    </script>
   </body>
 </html>
