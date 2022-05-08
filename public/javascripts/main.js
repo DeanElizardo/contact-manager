@@ -149,6 +149,8 @@ function renderContactContainer(contacts, currentTags) {
       "afterbegin",
       contactList({ contacts: contacts })
     );
+    setEditButtons();
+    setDeleteButtons();
   } else {
     let headerDiv = document.createElement("div");
     let buttonDiv = document.createElement("div");
@@ -169,6 +171,20 @@ function renderContactContainer(contacts, currentTags) {
       addContactForm(event, currentTags);
     };
   }
+}
+
+function setEditButtons() {
+  let buttons = Array.from(container.querySelectorAll('.editButton'));
+
+  buttons.forEach((button) => {
+    button.onclick = function (event) {
+      // Do something here
+    };
+  });
+}
+
+function setDeleteButtons() {
+  let buttons = Array.from(container.querySelectorAll('.deleteButton'));
 }
 
 async function getTags(contacts) {
