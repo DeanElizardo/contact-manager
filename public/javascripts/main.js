@@ -1,7 +1,12 @@
-//=============================================================Contact container
+//================================================================Initialization
 let container = document.querySelector("#contactContainer");
+let searchForm = document.querySelector("#searchAndEntry");
+let searchField = document.querySelector("#searchField");
+let tagDiv = document.querySelector("#contact_tags");
+let addForm = document.querySelector("#add_contact_form");
+let cancelAdd = document.querySelector("#cancel_add");
 
-Handlebars.registerHelper('splitTags', splitTags);
+Handlebars.registerHelper("splitTags", splitTags);
 
 Handlebars.registerPartial(
   "contact_partial",
@@ -12,32 +17,53 @@ let contactList = Handlebars.compile(
   document.querySelector("#contact_list").innerHTML
 );
 
+let contactTags = Handlebars.compile(
+  document.querySelector("#contact_tags_template").innerHTML
+);
+
 // load all contacts in lexicographical order by default
 document.addEventListener("DOMContentLoaded", async function (event) {
-  let contacts = await getContacts();
-  renderContactContainer(contacts);
+  let [contacts, currentTags] = await getContacts();
+  renderContactContainer(contacts, currentTags);
 });
 
 //==================================================================Search Field
+searchField.addEventListener("keyup", async function (event) {
+  event.preventDefault();
+  let searchString = event.currentTarget.value;
+  let [contacts, currentTags] = await getContacts();
+  let matching = matchingSubstrings(contacts, searchString);
 
-document
-  .querySelector("#searchField")
-  .addEventListener("keyup", async function (event) {
-    event.preventDefault();
-    let searchString = event.currentTarget.value;
-    let contacts = await getContacts();
-    let matching = matchingSubstrings(contacts, searchString);
+  renderContactContainer(matching, currentTags);
+});
 
-    renderContactContainer(matching);
-  });
+//================================================================='Add Contact'
+addForm.addEventListener("submit", function (event) {
+  event.preventDefault();
 
-//=========================================================='Add Contact' Button
+  let form = event.currentTarget;
+  let data = new FormData(form);
+
+  console.log(form); //!debugging
+  console.log(data.get("email")); //!debugging
+});
+
+cancelAdd.addEventListener("click", async function (event) {
+  event.preventDefault();
+
+  let [contacts, currentTags] = await getContacts();
+  renderContactContainer(contacts, currentTags);
+  addForm.reset();
+  searchForm.reset();
+  showSearchPhase();
+});
+
 document
   .querySelector("form#searchAndEntry")
-  .addEventListener("submit", function (event) {
+  .addEventListener("submit", async function (event) {
     event.preventDefault();
-
-    alert("Default Prevented");
+    let [contacts, currentTags] = await getContacts();
+    addContactForm(event, currentTags);
   });
 
 //==============================================================Helper functions
@@ -47,15 +73,16 @@ async function getContacts() {
       method: "GET",
     });
     var contacts = await response.json();
+    var currentTags = await getTags(contacts);
   } catch (error) {
     console.log(`Fetch error in 'getContacts': ${error}`);
   }
 
-  return contacts;
+  return [contacts, currentTags];
 }
 
 function splitTags(tags) {
-  return tags.split(',');
+  return (tags ? tags.split(",") : []);
 }
 
 function sortContacts(contacts) {
@@ -78,8 +105,18 @@ function matchingSubstrings(contacts, searchString) {
   return contacts.filter((contact) => search.test(contact.full_name));
 }
 
-function renderContactContainer(contacts) {
-  container.innerHTML = "";
+function emptyContainer(node) {
+  for (let idx = 0; idx < node.children.length; idx++) {
+    emptyContainer(node.children[idx]);
+  }
+
+  for (let idx = 0; idx < node.children.length; idx++) {
+    node.remove(node.children[idx]);
+  }
+}
+
+function renderContactContainer(contacts, currentTags) {
+  emptyContainer(container);
 
   if (contacts.length) {
     container.insertAdjacentHTML(
@@ -101,5 +138,48 @@ function renderContactContainer(contacts) {
     container.appendChild(buttonDiv);
     headerDiv.appendChild(noContactHeader);
     buttonDiv.appendChild(noContactButton);
+
+    noContactButton.onclick = (event) => {
+      addContactForm(event, currentTags);
+    };
   }
+}
+
+async function getTags(contacts) {
+  let tagSet = new Set();
+  contacts.forEach((contact) => {
+    tags = splitTags(contact.tags);
+    tags.forEach((tag) => tagSet.add(tag));
+  });
+
+  return tagSet.size ? Array.from(tagSet) : null;
+}
+
+function setStyle(hiding, showing) {
+  hiding.forEach((element) => (element.style = "display: none"));
+  showing.forEach((element) => (element.style = ""));
+}
+
+function showAddPhase(currentTags) {
+  let hiding = Array.from(document.querySelectorAll(".searchPhase"));
+  let showing = Array.from(document.querySelectorAll(".addPhase"));
+
+  emptyContainer(tagDiv);
+  tagDiv.innerHTML = contactTags({ tags: currentTags });
+
+  setStyle(hiding, showing);
+}
+
+function showSearchPhase() {
+  let hiding = Array.from(document.querySelectorAll(".addPhase"));
+  let showing = Array.from(document.querySelectorAll(".searchPhase"));
+
+  setStyle(hiding, showing);
+}
+
+function addContactForm(clickEvent, currentTags) {
+  clickEvent.preventDefault();
+  console.log("CURRENT TAGS", currentTags); //!debugging
+
+  showAddPhase(currentTags);
 }
