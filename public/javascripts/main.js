@@ -1,10 +1,13 @@
 //=============================================================Contact container
 let container = document.querySelector("#contactContainer");
 
+Handlebars.registerHelper('splitTags', splitTags);
+
 Handlebars.registerPartial(
   "contact_partial",
   document.querySelector("#contact_partial").innerHTML
 );
+
 let contactList = Handlebars.compile(
   document.querySelector("#contact_list").innerHTML
 );
@@ -22,15 +25,6 @@ document
   .addEventListener("keyup", async function (event) {
     event.preventDefault();
     let searchString = event.currentTarget.value;
-
-    // let key = event.key;
-    //
-    // if (/[a-z]/i.test(key)) {
-    // searchString += key;
-    // } else if (key.toLowerCase() === 'backspace') {
-    // searchString = searchString.slice(0, searchString.length - 1);
-    // }
-
     let contacts = await getContacts();
     let matching = matchingSubstrings(contacts, searchString);
 
@@ -58,6 +52,10 @@ async function getContacts() {
   }
 
   return contacts;
+}
+
+function splitTags(tags) {
+  return tags.split(',');
 }
 
 function sortContacts(contacts) {
