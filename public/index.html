@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Contact Manager</title>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js' integrity='sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg==' crossorigin='anonymous' referrerpolicy='no-referrer'></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"
+      integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script src="/javascripts/main.js" defer="true"></script>
   </head>
   <body>
     <header>
-      <h1>Contact's Manager</h1>
+      <h1>Ugly Contacts Manager</h1>
     </header>
     <form
       id="searchAndEntry"
@@ -34,7 +39,7 @@
     <div id="contactContainer"></div>
 
     <script id="contact_list" type="text/x-handlebars">
-      <ul>
+      <ul style="list-style: none">
         {{#each contacts}}
         {{> contact_partial}}
         {{/each}}
@@ -57,9 +62,21 @@
             <strong>Email:</strong>
             {{email}}
           </div>
+          {{#if tags}}
+          <div>
+            <p>
+              <strong>Tags:</strong>
+              {{#each (splitTags tags)}}
+              <a href='#'>{{this}}<a>
+              {{/each}}
+            </p>
+          </div>
+          {{/if}}
+          <div>
+          </div>
         <div>
-          <button id="edit{{id}}" value="Edit"></button>
-          <button id="delete{{id}}" value="Delete"></button>
+          <button id="edit{{id}}">Edit</button>
+          <button id="delete{{id}}">Delete</button>
         </div>
         </fieldset>
       </li>
