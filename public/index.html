@@ -73,6 +73,9 @@
     <!--ADD/EDIT CONTACT FORM TEMPLATES-->
     <script id="contact_form" type="text/x-handlebars">
       <form id="add_contact_form" name="addContact" method="POST" action="/addContact">
+        {{#if id}}
+        <input type="text" name="id" value={{id}} style="display: none">
+        {{/if}}
         <div>
           <label for="full_name">Name:  </label>
           <input type="text" id="full_name" name="full_name" value="{{full_name}}">
@@ -86,34 +89,47 @@
           <input type="text" id="email" name="email" value="{{email}}">
         </div>
         <div id="contact_tags">
+          <label for="tags_list">Tags: </label>
+          <ul id="tags_list" style="list-style: none">
+          {{#if tags}}
           {{#each (splitTags tags)}}
           {{> tags_template}}
           {{/each}}
+          {{/if}}
+          {{#each unchecked}}
+          {{> unchecked_template}}
+          {{/each}}
+          </ul>
+        </div>
+        <div>
+          <label for="new_tag">New Tag: </label>
+          <input type="text" id="tag_NewTag" name="tag_NewTag">
         </div>
         <div>
           <button id="cancel_add">Cancel</button>
+          {{#if id}}
+          <input type="submit" id="submit_add" value="Save Edit">
+          {{else}}
           <input type="submit" id="submit_add" value="Add Contact">
+          {{/if}}
         </div>
       </form>
     </script>
 
-    <!--A partial that generates a list of tags-->
+    <!--A partial that generates a checked tag-->
     <script id="tags_template" type="text/x-handlebars">
-      {{#if tags}}
-      <label for="tags_list">Tags: </label>
-      <ul id="tags_list" style="list-style: none">
-        {{#each tags}}
         <li>
-          <input type="checkbox" id="tag_{{this}}" name="tag_{{this}}" value="{{this}}">
+          <input type="checkbox" id="tag_{{this}}" name="tag_{{this}}" value="{{this}}" checked>
           <label for="tag_{{this}}">{{this}}</label>
         </li>
-        {{/each}}
-      </ul>
-      {{/if}}
-      <div>
-        <label for="new_tag">New Tag: </label>
-        <input type="text" id="tag_NewTag" name="tag_NewTag">
-      </div>
     </script>
+
+    <!--A partial that generates an unchecked tag-->
+    <script id="unchecked_template" type="text/x-handlebars">
+      <li>
+        <input type="checkbox" id="tag_{{this}}" name="tag_{{this}}" value="{{this}}">
+        <label for="tag_{{this}}">{{this}}</label>
+      </li>
+  </script>
   </body>
 </html>

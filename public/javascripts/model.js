@@ -1,6 +1,7 @@
 class Model {
   constructor() {
     this.contacts = [];
+    this.tags = [];
   }
 
   static _fetch = async (URI, options) => {
@@ -10,6 +11,10 @@ class Model {
       throw new Error(`Fetch error: ${response.statusText}`);
     }
 
+    if (options.method === "DELETE") {
+      return null;
+    }
+    
     return response.json();
   };
 
@@ -50,8 +55,27 @@ class Model {
     let URI = "/api/contacts";
     let options = { method: "GET" };
     this.contacts = await Model._fetch(URI, options);
+    this.tags = this._getTags(this.contacts);
 
     return this.contacts;
+  }
+
+  _getTags(contacts) {
+    let tags = new Set();
+
+    contacts.forEach((contact) => {
+      if (contact.tags) {
+        contact.tags.split(",").forEach((tag) => tags.add(tag));
+      }
+    });
+
+    return Array.from(tags);
+  }
+
+  getUncheckedTags(checkedTags) {
+    return checkedTags
+      ? this.tags.filter((tag) => !checkedTags.includes(tag))
+      : this.tags;
   }
 
   getSingleContact(id) {
@@ -103,6 +127,7 @@ class Model {
     let options = { method: "DELETE" };
 
     await Model._fetch(URI, options);
+    this._removeContact(id);
 
     return null;
   }

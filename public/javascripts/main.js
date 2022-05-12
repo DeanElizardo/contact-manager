@@ -27,9 +27,11 @@ class Controller {
   }
 
   async renderContactForm(contactID = null) {
+    let controller = this;
     let submitMethod = "POST";
     if (contactID) {
       let contact = await this.model.getSingleContact(contactID);
+      contact.unchecked = this.model.getUncheckedTags(contact.tags);
       this.view.renderContactForm(contact);
       submitMethod = "PUT";
     } else {
@@ -37,11 +39,16 @@ class Controller {
     }
 
     let cancelForm = document.querySelector('#cancel_add');
+    cancelForm.onclick = function (event) {
+      event.preventDefault();
+      controller.renderContactsPage(event);
+    }
+
     let submitForm = document.querySelector('#submit_add');
-
-    cancelForm.onclick = this.renderContactsPage;
-
-
+    submitForm.onclick = function (event) {
+      event.preventDefault();
+      controller.updateContact();
+    }
   }
 
   makeButtonsReady() {
@@ -81,6 +88,31 @@ class Controller {
 
   //-----------------------------------------------Adding-----------------------
   //---------------------------------------------Updating-----------------------
+  async updateContact() {
+    this.form = document.querySelector("#add_contact_form");
+
+    let rawData = new FormData(this.form);
+    let contactObj = {};
+    let tags = [];
+
+    for (let entry of rawData.entries()) {
+      if (/^tag_/.test(entry[0]) && entry[1] !== "") {
+        tags.push(entry[1]);
+      } else {
+        contactObj[entry[0]] = entry[1];
+      }
+    }
+
+    if (tags.length) {
+      contactObj["tags"] = tags.join(',');
+    } else {
+      contactObj["tags"] = null;
+    }
+
+    await this.model.updateContact(contactObj["id"], contactObj);
+    await this.renderContactsPage();
+  }
+
   editContact(clickEvent, controller) {
     clickEvent.preventDefault();
 
@@ -88,10 +120,12 @@ class Controller {
     controller.renderContactForm(contactID);
   }
   //---------------------------------------------Deleting-----------------------
-  deleteContact(clickEvent, controller) {
+  async deleteContact(clickEvent, controller) {
     clickEvent.preventDefault();
 
     let contactID = Number(clickEvent.currentTarget.getAttribute("id"));
+    await controller.model.deleteContact(contactID);
+    await controller.renderContactsPage();
   }
 }
 

@@ -4,6 +4,7 @@ class View {
   #contactCardHTML;
   #contactFormHTML;
   #tagListHTML;
+  #uncheckedListHTML;
   #emptyContact;
 
   constructor() {
@@ -12,16 +13,19 @@ class View {
       phone_number: "",
       email: "",
       tags: null,
+      id: null
     };
     //==============================================================HTML STRINGS
     this.#contactListHTML = document.querySelector("#contact_list").innerHTML;
     this.#contactCardHTML = document.querySelector("#contact_card").innerHTML;
     this.#contactFormHTML = document.querySelector("#contact_form").innerHTML;
     this.#tagListHTML = document.querySelector("#tags_template").innerHTML;
+    this.#uncheckedListHTML = document.querySelector("#unchecked_template").innerHTML;
 
     //======================================================HANDELBARS TEMPLATES
     Handlebars.registerPartial("contact_card", this.#contactCardHTML);
     Handlebars.registerPartial("tags_template", this.#tagListHTML);
+    Handlebars.registerPartial("unchecked_template", this.#uncheckedListHTML);
 
     Handlebars.registerHelper("splitTags", (tags) => tags.split(","));
 
@@ -62,7 +66,6 @@ class View {
   renderContactForm(contact = this.#emptyContact) {
     this.#emptyDiv(this.contactForm);
     this.contactForm.innerHTML = this.contactFormTemplate(contact);
-    console.log(this.contactFormTemplate(contact)); //!debugging
     this.#showContactForm();
 
     return 
