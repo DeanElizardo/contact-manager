@@ -4,15 +4,116 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Contact Manager</title>
+    <title>Little Ugly Contact Manager</title>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"
       integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
-    <script src="/javascripts/main.js" defer="true"></script>
+    <script src="/javascripts/main.js" type="module" defer="true"></script>
   </head>
   <body id="body">
+    <h1>Little Ugly Contact Manager</h1>
+    <div class="showing_contacts">
+      <form id="search" method="post" action="#">
+        <input type="submit" value="Add Contact" />
+        <input id="searchField" type="text" placeholder="Search" />
+      </form>
+    </div>
+    <div id="contactContainer" class="showing_contacts"></div>
+    <div id="contactForm" class="changing_contacts"></div>
+
+    <!--CONTACT LIST TEMPLATES-->
+    <script id="contact_list" type="text/x-handlebars">
+      <ul style="list-style: none">
+        {{#each contacts}}
+        {{> contact_card}}
+        {{/each}}
+      <ul>
+    </script>
+
+    <!--A paritial that generates individual contacts-->
+    <script id="contact_card" type="text/x-handlebars">
+      <li>
+        <fieldset style="border: solid black 1px">
+          <div>
+            <h3>{{full_name}}</h3>
+          </div>
+          <div>
+            <p>
+              <strong>Phone number:</strong>
+              {{phone_number}}
+            </p>
+          </div>
+          <div>
+            <strong>Email:</strong>
+            {{email}}
+          </div>
+          {{#if tags}}
+          <div>
+            <p>
+              <strong>Tags:</strong>
+              {{#each (splitTags tags)}}
+              <a href='#'>{{this}}<a>
+              {{/each}}
+            </p>
+          </div>
+          {{/if}}
+          <div>
+          </div>
+        <div>
+          <button id="{{id}}" class="editButton">Edit</button>
+          <button id="{{id}}" class="deleteButton">Delete</button>
+        </div>
+        </fieldset>
+      </li>
+    </script>
+
+    <!--ADD/EDIT CONTACT FORM TEMPLATES-->
+    <script id="contact_form" type="text/x-handlebars">
+      <form id="add_contact_form" name="addContact" method="POST" action="/addContact">
+        <div>
+          <label for="full_name">Name:  </label>
+          <input type="text" id="full_name" name="full_name" value="{{full_name}}">
+        </div>
+        <div>
+          <label for="phone_number">Phone: </label>
+          <input type="text" id="phone_number" name="phone_number" value="{{phone_number}}">
+        </div>
+        <div>
+          <label for="email">Email:  </label>
+          <input type="text" id="email" name="email" value="{{email}}">
+        </div>
+        <div id="contact_tags">
+          {{#each (splitTags tags)}}
+          {{> tags_template}}
+          {{/each}}
+        </div>
+        <div>
+          <button id="cancel_add">Cancel</button>
+          <input type="submit" id="submit_add" value="Add Contact">
+        </div>
+      </form>
+    </script>
+
+    <!--A partial that generates a list of tags-->
+    <script id="tags_template" type="text/x-handlebars">
+      {{#if tags}}
+      <label for="tags_list">Tags: </label>
+      <ul id="tags_list" style="list-style: none">
+        {{#each tags}}
+        <li>
+          <input type="checkbox" id="tag_{{this}}" name="tag_{{this}}" value="{{this}}">
+          <label for="tag_{{this}}">{{this}}</label>
+        </li>
+        {{/each}}
+      </ul>
+      {{/if}}
+      <div>
+        <label for="new_tag">New Tag: </label>
+        <input type="text" id="tag_NewTag" name="tag_NewTag">
+      </div>
+    </script>
   </body>
 </html>
