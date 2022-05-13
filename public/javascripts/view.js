@@ -5,16 +5,8 @@ class View {
   #contactFormHTML;
   #tagListHTML;
   #uncheckedListHTML;
-  #emptyContact;
 
   constructor() {
-    this.#emptyContact = {
-      full_name: "",
-      phone_number: "",
-      email: "",
-      tags: null,
-      id: null
-    };
     //==============================================================HTML STRINGS
     this.#contactListHTML = document.querySelector("#contact_list").innerHTML;
     this.#contactCardHTML = document.querySelector("#contact_card").innerHTML;
@@ -63,12 +55,11 @@ class View {
     this.contactForm.style = "display: none";
   }
 
-  renderContactForm(contact = this.#emptyContact) {
+  renderContactForm(contact) {
     this.#emptyDiv(this.contactForm);
     this.contactForm.innerHTML = this.contactFormTemplate(contact);
     this.#showContactForm();
 
-    return 
   }
 
   #showContactForm() {

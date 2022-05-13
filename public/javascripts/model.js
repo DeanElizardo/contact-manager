@@ -57,6 +57,9 @@ class Model {
     this.contacts = await Model._fetch(URI, options);
     this.tags = this._getTags(this.contacts);
 
+    this.sortContacts();
+    this.sortTags();
+
     return this.contacts;
   }
 
@@ -130,6 +133,33 @@ class Model {
     this._removeContact(id);
 
     return null;
+  }
+
+  //=====================================================================HELPERS
+  sortContacts() {
+    this.contacts.sort((a, b) => {
+      let aName = a.full_name;
+      let bName = b.full_name;
+      if (aName < bName) {
+        return -1;
+      } else if (aName > bName) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+
+  sortTags() {
+    this.tags.sort((a, b) => {
+      if (a < b) {
+        return -1;
+      } else if (a > b) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
 }
 

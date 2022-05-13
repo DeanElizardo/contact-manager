@@ -5,9 +5,18 @@ class Controller {
   constructor(model, view) {
     this.model = model;
     this.view = view;
+    this.emptyContact = {
+      full_name: "",
+      phone_number: "",
+      email: "",
+      tags: null,
+      unchecked: null,
+      id: null
+    };
 
     //=============================================================PAGE ELEMENTS
     this.searchField = document.querySelector("#searchField");
+    this.addContactButton = document.querySelector("#addContactButton");
     this.clearTagFilterButton = document.querySelector('#clearTags');
 
     //============================================================INITIALIZE MVC
@@ -22,11 +31,21 @@ class Controller {
   }
 
   async renderContactsPage() {
+    let controller = this;
+
     await this.model.getContacts();
     this.view.renderContactContainer(this.model.contacts);
     this.makeButtonsReady();
     this.makeTagLinksReady();
     this.hideClearTag();
+    this.addContactButton.onclick = function (event) {
+      event.preventDefault();
+      controller.renderContactForm();
+    }
+  }
+
+  async addContact() {
+    await this.renderContactForm();
   }
 
   async renderContactForm(contactID = null) {
@@ -38,7 +57,8 @@ class Controller {
       this.view.renderContactForm(contact);
       submitMethod = "PUT";
     } else {
-      this.view.renderContactForm();
+      this.emptyContact.unchecked = this.model.tags;
+      this.view.renderContactForm(this.emptyContact);
     }
 
     let cancelForm = document.querySelector('#cancel_add');
@@ -50,7 +70,11 @@ class Controller {
     let submitForm = document.querySelector('#submit_add');
     submitForm.onclick = function (event) {
       event.preventDefault();
-      controller.updateContact();
+      if (contactID) {
+        controller.updateContact();
+      } else {
+        controller.addContact();
+      }
     }
   }
 
@@ -127,10 +151,9 @@ class Controller {
     this.makeTagLinksReady();
     this.showClearTag();
   }
-
+  
   //-----------------------------------------------Adding-----------------------
-  //---------------------------------------------Updating-----------------------
-  async updateContact() {
+  prepareFormData() {
     this.form = document.querySelector("#add_contact_form");
 
     let rawData = new FormData(this.form);
@@ -151,6 +174,20 @@ class Controller {
       contactObj["tags"] = null;
     }
 
+    return contactObj;
+  }
+
+  async addContact() {
+    let contactObj = this.prepareFormData();
+    contactObj.unchecked = this.model.tags;
+
+    await this.model.addContact(contactObj);
+    await this.renderContactsPage();
+  }
+  //---------------------------------------------Updating-----------------------
+  async updateContact() {
+    let contactObj = this.prepareFormData();
+
     await this.model.updateContact(contactObj["id"], contactObj);
     await this.renderContactsPage();
   }
@@ -161,6 +198,7 @@ class Controller {
     let contactID = Number(clickEvent.currentTarget.getAttribute("id"));
     controller.renderContactForm(contactID);
   }
+
   //---------------------------------------------Deleting-----------------------
   async deleteContact(clickEvent, controller) {
     clickEvent.preventDefault();
