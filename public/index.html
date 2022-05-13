@@ -19,6 +19,7 @@
       <form id="search" method="post" action="#">
         <input type="submit" value="Add Contact" />
         <input id="searchField" type="text" placeholder="Search" />
+        <input id="clearTags" type="submit" value="Clear Tags" style="display: none">
       </form>
     </div>
     <div id="contactContainer" class="showing_contacts"></div>
@@ -55,7 +56,7 @@
             <p>
               <strong>Tags:</strong>
               {{#each (splitTags tags)}}
-              <a href='#'>{{this}}<a>
+              <a href='#' class="taglink">{{this}}<a>
               {{/each}}
             </p>
           </div>

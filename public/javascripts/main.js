@@ -8,6 +8,7 @@ class Controller {
 
     //=============================================================PAGE ELEMENTS
     this.searchField = document.querySelector("#searchField");
+    this.clearTagFilterButton = document.querySelector('#clearTags');
 
     //============================================================INITIALIZE MVC
     Controller.#init(this);
@@ -24,6 +25,8 @@ class Controller {
     await this.model.getContacts();
     this.view.renderContactContainer(this.model.contacts);
     this.makeButtonsReady();
+    this.makeTagLinksReady();
+    this.hideClearTag();
   }
 
   async renderContactForm(contactID = null) {
@@ -69,6 +72,29 @@ class Controller {
     });
   }
 
+  makeTagLinksReady() {
+    let controller = this;
+    let tags = Array.from(document.querySelectorAll('.taglink'));
+
+    tags.forEach((tag) => {
+      tag.onclick = function (event) {
+        controller.renderWithMatchingTags(event);
+      }
+    })
+  }
+
+  clearTagFilters() {
+    this.renderContactsPage();
+  }
+
+  showClearTag() {
+    this.clearTagFilterButton.style = "";
+  }
+
+  hideClearTag() {
+    this.clearTagFilterButton.style = "display: none";
+  }
+
   //=====================================================EVENT HANDLER CALLBACKS
   //--------------------------------------------Searching-----------------------
   search(keyUpEvent, controller) {
@@ -84,6 +110,22 @@ class Controller {
   getMatches(text, contacts) {
     let regex = new RegExp(text, "i");
     return contacts.filter((contact) => regex.test(contact.full_name));
+  }
+
+  renderWithMatchingTags(clickEvent) {
+    let controller = this;
+    let tag = new RegExp(clickEvent.target.textContent);
+    let matchingContacts = this.model.contacts.filter((contact) => tag.test(contact.tags));
+
+    this.clearTagFilterButton.onclick = function (event) {
+      event.preventDefault();
+      controller.clearTagFilters();
+    };
+
+    controller.view.renderContactContainer(matchingContacts);
+    this.makeButtonsReady();
+    this.makeTagLinksReady();
+    this.showClearTag();
   }
 
   //-----------------------------------------------Adding-----------------------
