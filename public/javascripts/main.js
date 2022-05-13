@@ -1,5 +1,6 @@
-import { Model } from './model.js';
-import { View } from './view.js';
+import { Model } from "./model.js";
+import { View } from "./view.js";
+import { validateEmail, validatePhoneNumber } from "./validators.js";
 
 class Controller {
   constructor(model, view) {
@@ -11,13 +12,13 @@ class Controller {
       email: "",
       tags: null,
       unchecked: null,
-      id: null
+      id: null,
     };
 
     //=============================================================PAGE ELEMENTS
     this.searchField = document.querySelector("#searchField");
     this.addContactButton = document.querySelector("#addContactButton");
-    this.clearTagFilterButton = document.querySelector('#clearTags');
+    this.clearTagFilterButton = document.querySelector("#clearTags");
 
     //============================================================INITIALIZE MVC
     Controller.#init(this);
@@ -41,7 +42,7 @@ class Controller {
     this.addContactButton.onclick = function (event) {
       event.preventDefault();
       controller.renderContactForm();
-    }
+    };
   }
 
   async addContact() {
@@ -50,24 +51,22 @@ class Controller {
 
   async renderContactForm(contactID = null) {
     let controller = this;
-    let submitMethod = "POST";
     if (contactID) {
       let contact = await this.model.getSingleContact(contactID);
       contact.unchecked = this.model.getUncheckedTags(contact.tags);
       this.view.renderContactForm(contact);
-      submitMethod = "PUT";
     } else {
       this.emptyContact.unchecked = this.model.tags;
       this.view.renderContactForm(this.emptyContact);
     }
 
-    let cancelForm = document.querySelector('#cancel_add');
+    let cancelForm = document.querySelector("#cancel_add");
     cancelForm.onclick = function (event) {
       event.preventDefault();
       controller.renderContactsPage(event);
-    }
+    };
 
-    let submitForm = document.querySelector('#submit_add');
+    let submitForm = document.querySelector("#submit_add");
     submitForm.onclick = function (event) {
       event.preventDefault();
       if (contactID) {
@@ -75,7 +74,7 @@ class Controller {
       } else {
         controller.addContact();
       }
-    }
+    };
   }
 
   makeButtonsReady() {
@@ -98,13 +97,13 @@ class Controller {
 
   makeTagLinksReady() {
     let controller = this;
-    let tags = Array.from(document.querySelectorAll('.taglink'));
+    let tags = Array.from(document.querySelectorAll(".taglink"));
 
     tags.forEach((tag) => {
       tag.onclick = function (event) {
         controller.renderWithMatchingTags(event);
-      }
-    })
+      };
+    });
   }
 
   clearTagFilters() {
@@ -139,7 +138,9 @@ class Controller {
   renderWithMatchingTags(clickEvent) {
     let controller = this;
     let tag = new RegExp(clickEvent.target.textContent);
-    let matchingContacts = this.model.contacts.filter((contact) => tag.test(contact.tags));
+    let matchingContacts = this.model.contacts.filter((contact) =>
+      tag.test(contact.tags)
+    );
 
     this.clearTagFilterButton.onclick = function (event) {
       event.preventDefault();
@@ -151,7 +152,7 @@ class Controller {
     this.makeTagLinksReady();
     this.showClearTag();
   }
-  
+
   //-----------------------------------------------Adding-----------------------
   prepareFormData() {
     this.form = document.querySelector("#add_contact_form");
@@ -169,27 +170,49 @@ class Controller {
     }
 
     if (tags.length) {
-      contactObj["tags"] = tags.join(',');
+      contactObj["tags"] = tags.join(",");
     } else {
       contactObj["tags"] = null;
     }
 
-    return contactObj;
+    if (!validateEmail(contactObj.email)) {
+      alert("Please enter a properly formatted email address.");
+      if (contactObj.id) {
+        this.renderContactForm(Number(contactObj.id));
+      } else {
+        this.renderContactForm();
+      }
+      return false;
+    } else if (!validatePhoneNumber(contactObj.phone_number)) {
+      alert("Please enter a properly formatted 10 digit phone number");
+      if (contactObj.id) {
+        this.renderContactForm(Number(contactObj.id));
+      } else {
+        this.renderContactForm();
+      }
+      return false;
+    } else {
+      return contactObj;
+    }
   }
 
   async addContact() {
     let contactObj = this.prepareFormData();
-    contactObj.unchecked = this.model.tags;
+    if (contactObj) {
+      contactObj.unchecked = this.model.tags;
 
-    await this.model.addContact(contactObj);
-    await this.renderContactsPage();
+      await this.model.addContact(contactObj);
+      await this.renderContactsPage();
+    }
   }
   //---------------------------------------------Updating-----------------------
   async updateContact() {
     let contactObj = this.prepareFormData();
 
-    await this.model.updateContact(contactObj["id"], contactObj);
-    await this.renderContactsPage();
+    if (contactObj) {
+      await this.model.updateContact(contactObj["id"], contactObj);
+      await this.renderContactsPage();
+    }
   }
 
   editContact(clickEvent, controller) {
