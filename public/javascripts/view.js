@@ -30,6 +30,7 @@ class View {
     );
     this.contactContainer = document.querySelector("#contactContainer");
     this.contactForm = document.querySelector("#contactForm");
+    this.noMatches = document.querySelector("#noMatches");
   }
 
   #emptyDiv(node) {
@@ -47,12 +48,25 @@ class View {
     this.contactContainer.innerHTML = this.contactListTemplate({
       contacts: data,
     });
+    if (data.length) {
+      this.#hideNoMatches();
+    } else {
+      this.#showNoMatches();
+    }
     this.#showContactContainer();
   }
 
   #showContactContainer() {
     this.containerElements.forEach((element) => (element.style = ""));
     this.contactForm.style = "display: none";
+  }
+
+  #showNoMatches() {
+    this.noMatches.style = "";
+  }
+
+  #hideNoMatches() {
+    this.noMatches.style = "display: none";
   }
 
   renderContactForm(contact) {
